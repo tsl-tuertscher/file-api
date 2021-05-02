@@ -10,4 +10,3 @@ func TestFileExists(t *testing.T) {
         t.Errorf("fileExists('./test.json')")
     }
 }
-
