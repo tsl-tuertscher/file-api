@@ -20,5 +20,3 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - run: go test ./vendor/fs -v
-      - run: go mod download
-      - run: go build -o main
