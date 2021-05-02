@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"log"
 	"github.com/gorilla/mux"
-	"fs"
 )
 
 type Config struct {
@@ -93,7 +92,7 @@ func getCommandLineArguments() Parameter {
 
 func getConfigData(path string) (Config, error) {
 	var result Config
-	if fs.FileExists(path) {
+	if FileExists(path) {
 		jsonFile, err := os.Open(path)
 		// if we os.Open returns an error then handle it
 		if err != nil {
