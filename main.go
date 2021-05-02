@@ -22,7 +22,6 @@ type Parameter struct {
 	Port string
 }
 
-
 func main() {
 	fmt.Println("Starting")
 	para := getCommandLineArguments()
@@ -89,7 +88,6 @@ func getCommandLineArguments() Parameter {
 
 }
 
-
 func getConfigData(path string) (Config, error) {
 	var result Config
 	if FileExists(path) {
@@ -115,6 +113,4 @@ func getConfigData(path string) (Config, error) {
 	} else {
 		return result, errors.New("Couldn't load config")
 	}
-
-
 }
