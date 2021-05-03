@@ -19,4 +19,5 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
+      - run: go mod vendor
       - run: go test -v
