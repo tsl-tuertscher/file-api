@@ -20,4 +20,5 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - run: go mod vendor
+      - run: go build
       - run: go test -v
