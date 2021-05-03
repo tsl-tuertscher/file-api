@@ -8,6 +8,7 @@ import (
 	"os"
 	"net/http"
 	"log"
+	"strings"
 	"github.com/gorilla/mux"
 )
 
@@ -22,23 +23,33 @@ type Parameter struct {
 	Port string
 }
 
-func main() {
-	fmt.Println("Starting")
-	para := getCommandLineArguments()
-
-	config, err := getConfigData(para.Config)
-	if err != nil {
-		errors.New("Couldn't load config")
-	}
-
-	handleRequests(para, config)
+type AddSource struct {
+	Url      string `json:"url"`
 }
 
-func handleRequests(para Parameter, config Config) {
+var config Config
+var para Parameter
+
+func main() {
+	fmt.Println("Starting")
+	para = getCommandLineArguments()
+
+	configRaw, err := getConfigData(para.Config)
+	if err != nil {
+		errors.New("Couldn't load config")
+	} else {
+		config = configRaw
+	}
+
+	handleRequests()
+}
+
+func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", defaultHandler)
 	myRouter.HandleFunc("/health", getHealth)
-	myRouter.HandleFunc("/tiles/{z}/{x}/{y}", getTile)
+	myRouter.HandleFunc("/tiles/{source}/{z}/{x}/{y}", getTile)
+	myRouter.HandleFunc("/tiles/{source}", addSource).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":" + para.Port , myRouter))
 }
@@ -52,9 +63,48 @@ func getHealth(w http.ResponseWriter, r *http.Request){
 }
 
 func getTile(w http.ResponseWriter, r *http.Request){
-	vars := mux.Vars(r)
-	fmt.Fprintf(w, "Category: %v\n", vars["z"])
+	// curl localhost:8080/tiles/base/180/9/137.hgt?key=23
+	key := r.FormValue("key")
+	if CheckKey(config.Key, key) {
+		vars := mux.Vars(r)
+		y := strings.Split(vars["y"], ".")
+		url := GetTileUrl(config, vars["source"], vars["z"], vars["x"], y[0], y[1])
+		w.Header().Set("Content-Type", GetMimeTypeFromFileType(y[1]))
+		http.ServeFile(w, r, url)
+
+	} else {
+
+	}
 }
+
+func addSource(w http.ResponseWriter, r *http.Request){
+	// curl localhost:8080/tiles/base -X POST -H "key: asdf" -H "Content-Type: application/json" --data "{\"url\": \"https://onedrive.live.com/download?cid=1D70A897B7EE577D&resid=1D70A897B7EE577D%2141908&authkey=AAq3K6TPlnu68KQ\",\"dest\":\"latest/base\",\"name\":\"wt_top\"}"
+	key := r.Header.Get("key")
+	if CheckKey(config.Key, key) {
+		vars := mux.Vars(r)
+		reqBody, _ := ioutil.ReadAll(r.Body)
+		var source AddSource 
+		json.Unmarshal(reqBody, &source)
+		// update our global Articles array to include
+		// our new Article
+	
+		dest, err := DownloadTileSource(config, vars["source"], source.Url)
+		if err != nil {
+			fmt.Fprintf(w, "Couldn't download file")
+		}
+		target := [2]string{config.Offset, vars["source"]}
+		err = UnzipFile(dest, strings.Join((target)[:], "/"))
+		if err != nil {
+			fmt.Fprintf(w, "Couldn't unzip file")
+		}
+		fmt.Fprintf(w, "Success")
+
+	} else {
+		fmt.Fprintf(w, "Success")
+
+	}
+
+} 
 
 func getCommandLineArguments() Parameter {
 	args := os.Args
