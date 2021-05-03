@@ -1,8 +1,7 @@
 FROM golang:1.14
+COPY . /usr/src/app/
+WORKDIR /usr/src/app/
 
-WORKDIR /usr/src/app
-
-COPY go.mod go.sum ./
 COPY vendor ./
 
 RUN go mod vendor
