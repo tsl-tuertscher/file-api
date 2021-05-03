@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"log"
 	"github.com/gorilla/mux"
-	"fs"
 )
 
 type Config struct {
@@ -22,7 +21,6 @@ type Parameter struct {
 	Config string
 	Port string
 }
-
 
 func main() {
 	fmt.Println("Starting")
@@ -90,10 +88,9 @@ func getCommandLineArguments() Parameter {
 
 }
 
-
 func getConfigData(path string) (Config, error) {
 	var result Config
-	if fs.FileExists(path) {
+	if FileExists(path) {
 		jsonFile, err := os.Open(path)
 		// if we os.Open returns an error then handle it
 		if err != nil {
@@ -116,6 +113,4 @@ func getConfigData(path string) (Config, error) {
 	} else {
 		return result, errors.New("Couldn't load config")
 	}
-
-
 }
