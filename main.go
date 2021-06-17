@@ -13,7 +13,7 @@ import (
 )
 
 type Config struct {
-	WorkingDirectory string     `json:"WorkingDirectory"`
+	WorkingDirectory string     `json:"workingDirectory"`
 	Key []string      			`json:"key"`
 	Offset string 				`json:"offset"`
 }
