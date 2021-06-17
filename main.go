@@ -36,7 +36,7 @@ func main() {
 
 	configRaw, err := getConfigData(para.Config)
 	if err != nil {
-		errors.New("Couldn't load config")
+		fmt.Println("Couldn't load config")
 	} else {
 		config = configRaw
 	}
