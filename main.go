@@ -100,7 +100,7 @@ func addSource(w http.ResponseWriter, r *http.Request){
 		fmt.Fprintf(w, "Success")
 
 	} else {
-		fmt.Fprintf(w, "Success")
+		fmt.Fprintf(w, "Key check failed")
 
 	}
 
