@@ -31,7 +31,6 @@ var config Config
 var para Parameter
 
 func main() {
-	fmt.Println("Starting")
 	para = getCommandLineArguments()
 
 	configRaw, err := getConfigData(para.Config)
@@ -39,6 +38,11 @@ func main() {
 		fmt.Println("Couldn't load config")
 	} else {
 		config = configRaw
+		fmt.Println("XXXXXXXXXXXXXXXXXXXXXXXXXXX CONFIG XXXXXXXXXXXXXXXXXXXXXXXXXXX")
+		fmt.Println("Key: " +  strings.Join(config.Key, ", "))
+		fmt.Println("WorkingDirectory: " + config.WorkingDirectory)
+		fmt.Println("Offset: " + config.Offset)
+		fmt.Println("XXXXXXXXXXXXXXXXXXXXXXXXXXX CONFIG XXXXXXXXXXXXXXXXXXXXXXXXXXX")
 	}
 
 	handleRequests()
@@ -63,7 +67,8 @@ func getHealth(w http.ResponseWriter, r *http.Request){
 }
 
 func getTile(w http.ResponseWriter, r *http.Request){
-	// curl localhost:8080/tiles/base/180/9/137.hgt?key=23
+	// curl localhost:8080/tiles/terrain/180/9/137.json?key=pwieub3289h
+	// curl https://terrain-api.dev.tsl-tuertscher.com/tiles/terrain/180/9/137.json?key=pwieub3289h
 	key := r.FormValue("key")
 	if CheckKey(config.Key, key) {
 		vars := mux.Vars(r)
@@ -78,7 +83,8 @@ func getTile(w http.ResponseWriter, r *http.Request){
 }
 
 func addSource(w http.ResponseWriter, r *http.Request){
-	// curl localhost:8080/tiles/base -X POST -H "key: asdf" -H "Content-Type: application/json" --data "{\"url\": \"https://onedrive.live.com/download?cid=1D70A897B7EE577D&resid=1D70A897B7EE577D%2141908&authkey=AAq3K6TPlnu68KQ\",\"dest\":\"latest/base\",\"name\":\"wt_top\"}"
+	// curl localhost:8080/tiles/terrain -X POST -H "key: pwieub3289h" -H "Content-Type: application/json" --data "{\"url\": \"https://storage.googleapis.com/storage.newaydata.com/transfer/terrain/temp.zip\",\"dest\":\"latest/base\",\"name\":\"wt_top\"}"
+	// curl https://terrain-api.dev.tsl-tuertscher.com/tiles/terrain -X POST -H "key: pwieub3289h" -H "Content-Type: application/json" --data "{\"url\": \"https://storage.googleapis.com/storage.newaydata.com/transfer/terrain/temp.zip\"}"
 	key := r.Header.Get("key")
 	if CheckKey(config.Key, key) {
 		vars := mux.Vars(r)
